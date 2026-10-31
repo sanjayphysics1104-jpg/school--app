@@ -1,4 +1,4 @@
-const notices = [
+const defaultNotices = [
   {
     type: "notice",
     label: "Admission",
@@ -30,6 +30,20 @@ const notices = [
   }
 ];
 
+const STORAGE_KEY = "sunshine-academy-admin-updates";
+
+function loadAdminUpdates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    return Array.isArray(saved) ? saved.filter((item) => item.title && item.text && item.type) : [];
+  } catch {
+    return [];
+  }
+}
+
+let adminUpdates = loadAdminUpdates();
+let notices = [...adminUpdates, ...defaultNotices];
+
 const noticeList = document.querySelector("#notice-list");
 const filters = document.querySelectorAll(".filter");
 const menuButton = document.querySelector(".menu-button");
@@ -37,19 +51,31 @@ const navLinks = document.querySelector(".nav-links");
 const form = document.querySelector("#enquiry-form");
 const formStatus = document.querySelector("#form-status");
 const installButton = document.querySelector("#install-app");
+const adminForm = document.querySelector("#admin-update-form");
+const adminStatus = document.querySelector("#admin-status");
 let deferredInstallPrompt;
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>'"]/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#39;",
+    '"': "&quot;"
+  })[character]);
+}
 
 function renderNotices(filter = "all") {
   const items = filter === "all" ? notices.slice(0, 3) : notices.filter((notice) => notice.type === filter);
   noticeList.innerHTML = items.map((notice) => `
     <article class="notice-card ${notice.featured ? "featured" : ""}">
       <div class="notice-meta">
-        <span class="notice-type">${notice.label}</span>
-        <time class="notice-date">${notice.date}</time>
+        <span class="notice-type">${escapeHTML(notice.label)}</span>
+        <time class="notice-date">${escapeHTML(notice.date)}</time>
       </div>
-      <h3>${notice.title}</h3>
-      <p>${notice.text}</p>
-      <button type="button" aria-label="Read ${notice.title}">Read update →</button>
+      <h3>${escapeHTML(notice.title)}</h3>
+      <p>${escapeHTML(notice.text)}</p>
+      <button type="button" aria-label="Read ${escapeHTML(notice.title)}">Read update →</button>
     </article>
   `).join("");
 }
@@ -60,6 +86,38 @@ filters.forEach((button) => {
     button.classList.add("active");
     renderNotices(button.dataset.filter);
   });
+});
+
+adminForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const data = new FormData(adminForm);
+  const type = String(data.get("category"));
+  const labels = { notice: "Notice", homework: "Homework", circular: "Circular" };
+  const update = {
+    id: Date.now(),
+    type,
+    label: labels[type] || "Notice",
+    date: new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(new Date()),
+    title: String(data.get("title")).trim(),
+    text: String(data.get("description")).trim()
+  };
+
+  if (!update.title || !update.text) return;
+
+  adminUpdates.unshift(update);
+  notices = [...adminUpdates, ...defaultNotices];
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(adminUpdates));
+  } catch {
+    adminStatus.textContent = "Update added, but this browser could not save it for later.";
+  }
+
+  filters.forEach((item) => item.classList.toggle("active", item.dataset.filter === "all"));
+  renderNotices();
+  adminForm.reset();
+  if (!adminStatus.textContent) adminStatus.textContent = "Update added to the notice board.";
+  noticeList.querySelector(".notice-card")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  window.setTimeout(() => { adminStatus.textContent = ""; }, 5000);
 });
 
 menuButton.addEventListener("click", () => {

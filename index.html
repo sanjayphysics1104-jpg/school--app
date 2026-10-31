@@ -78,6 +78,36 @@
           <div><p class="eyebrow dark"><span></span> Stay informed</p><h2>Notice board</h2></div>
           <p>Important school updates, homework reminders and circulars—all in one place.</p>
         </div>
+        <div class="admin-panel reveal" id="admin">
+          <div class="admin-intro">
+            <span class="admin-icon" aria-hidden="true">＋</span>
+            <div>
+              <p class="admin-kicker">Admin section</p>
+              <h3>Post a new update</h3>
+              <p>Add an announcement to the notice board. Updates are saved on this device.</p>
+            </div>
+          </div>
+          <form class="admin-form" id="admin-update-form">
+            <div class="admin-field title-field">
+              <label for="update-title">Title</label>
+              <input id="update-title" name="title" type="text" maxlength="90" placeholder="e.g. School holiday update" required>
+            </div>
+            <div class="admin-field category-field">
+              <label for="update-category">Category</label>
+              <select id="update-category" name="category" required>
+                <option value="notice">Notice</option>
+                <option value="homework">Homework</option>
+                <option value="circular">Circular</option>
+              </select>
+            </div>
+            <div class="admin-field description-field">
+              <label for="update-description">Description</label>
+              <textarea id="update-description" name="description" maxlength="260" rows="3" placeholder="Write the update details…" required></textarea>
+            </div>
+            <button class="button admin-submit" type="submit">Add update <span aria-hidden="true">→</span></button>
+            <p class="admin-status" id="admin-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
         <div class="notice-filters reveal" role="group" aria-label="Filter notices">
           <button class="filter active" data-filter="all" type="button">All updates</button>
           <button class="filter" data-filter="notice" type="button">Notices</button>
