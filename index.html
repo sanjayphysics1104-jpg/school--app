@@ -26,6 +26,7 @@
       <div class="nav-links" id="nav-links">
         <a href="#notices">Notices</a>
         <a href="#academics">Academics</a>
+        <a href="#resources">Resources</a>
         <a href="#timetable">Timetable</a>
         <a href="#contact">Contact</a>
         <a class="nav-cta" href="tel:+917488875827">Call school</a>
@@ -143,6 +144,61 @@
       </div>
     </section>
 
+    <section class="section resources-section" id="resources">
+      <div class="shell">
+        <div class="section-heading reveal">
+          <div><p class="eyebrow dark"><span></span> Learning library</p><h2>Papers & study notes</h2></div>
+          <p>Capture a page with your camera or choose an image or PDF already saved on your device.</p>
+        </div>
+        <div class="upload-grid">
+          <article class="upload-card reveal">
+            <div class="upload-card-heading">
+              <span class="upload-icon" aria-hidden="true">Q</span>
+              <div><p class="upload-kicker">Assessment</p><h3>Question Paper</h3></div>
+            </div>
+            <form class="resource-upload-form" data-kind="question-paper">
+              <label for="paper-title">Paper title</label>
+              <input id="paper-title" name="title" type="text" maxlength="80" placeholder="e.g. Class VII Science Test" required>
+              <label class="file-picker" for="paper-file">
+                <input id="paper-file" name="file" type="file" accept="image/*,application/pdf" capture="environment" required>
+                <span class="file-picker-icon" aria-hidden="true">＋</span>
+                <strong>Choose file or take photo</strong>
+                <small>Image or PDF · up to 2 MB</small>
+                <span class="selected-file" data-file-name>No file selected</span>
+              </label>
+              <button class="button upload-button" type="submit">Upload paper <span aria-hidden="true">→</span></button>
+              <p class="upload-status" role="status" aria-live="polite"></p>
+            </form>
+          </article>
+          <article class="upload-card notes-card reveal delay-1">
+            <div class="upload-card-heading">
+              <span class="upload-icon notes" aria-hidden="true">N</span>
+              <div><p class="upload-kicker">Revision</p><h3>Study Notes</h3></div>
+            </div>
+            <form class="resource-upload-form" data-kind="study-notes">
+              <label for="notes-title">Notes title</label>
+              <input id="notes-title" name="title" type="text" maxlength="80" placeholder="e.g. Fractions revision notes" required>
+              <label class="file-picker" for="notes-file">
+                <input id="notes-file" name="file" type="file" accept="image/*,application/pdf" capture="environment" required>
+                <span class="file-picker-icon" aria-hidden="true">＋</span>
+                <strong>Choose file or take photo</strong>
+                <small>Image or PDF · up to 2 MB</small>
+                <span class="selected-file" data-file-name>No file selected</span>
+              </label>
+              <button class="button upload-button" type="submit">Upload notes <span aria-hidden="true">→</span></button>
+              <p class="upload-status" role="status" aria-live="polite"></p>
+            </form>
+          </article>
+        </div>
+        <div class="library-heading reveal">
+          <div><p class="upload-kicker">On this device</p><h3>Uploaded resources</h3></div>
+          <span id="resource-count">0 files</span>
+        </div>
+        <div class="resource-library" id="resource-library" aria-live="polite"></div>
+        <p class="storage-note"><span aria-hidden="true">ⓘ</span> Files are stored only in this browser. Avoid uploading confidential information and keep your original copy.</p>
+      </div>
+    </section>
+
     <section class="section timetable-section" id="timetable">
       <div class="shell">
         <div class="section-heading light reveal">
@@ -205,7 +261,7 @@
     <div class="shell footer-main">
       <a class="brand footer-brand" href="#home"><span class="brand-mark" aria-hidden="true">☀</span><span><strong>The Sunshine</strong><small>Academy</small></span></a>
       <p>English-medium education with care, clarity and confidence.</p>
-      <div class="footer-links"><a href="#notices">Notices</a><a href="#academics">Academics</a><a href="#contact">Admissions</a></div>
+      <div class="footer-links"><a href="#notices">Notices</a><a href="#academics">Academics</a><a href="#resources">Resources</a><a href="#contact">Admissions</a></div>
     </div>
     <div class="shell footer-bottom"><p>© <span id="year"></span> The Sunshine Academy. All rights reserved.</p><button id="install-app" type="button" hidden>Install app</button><a href="#home">Back to top ↑</a></div>
   </footer>

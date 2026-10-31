@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunshine-academy-v3";
+const CACHE_NAME = "sunshine-academy-v4";
 const APP_SHELL = [
   "./",
   "./index.html",

@@ -139,6 +139,51 @@ h1 em, h2 em { color: var(--sun); font-family: "Fraunces", serif; font-weight: 7
 .program-card strong { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); color: var(--blue); font-size: 12px; }
 .feature strong { color: var(--sun); border-color: rgba(255,255,255,.18); }
 
+.resources-section { background: #edf5f8; }
+.upload-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.upload-card { padding: 30px; border: 1px solid #d5e3e8; border-radius: var(--radius); background: white; box-shadow: 0 16px 45px rgba(18,52,91,.07); }
+.upload-card-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 23px; }
+.upload-icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 15px; color: var(--navy-deep); background: var(--sun); font-weight: 800; }
+.upload-icon.notes { color: white; background: var(--green); }
+.upload-kicker { margin: 0 0 3px; color: var(--blue); font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+.upload-card h3, .library-heading h3 { margin: 0; font-size: 22px; line-height: 1.2; }
+.resource-upload-form > label:not(.file-picker) { display: block; margin: 13px 0 6px; color: var(--navy); font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+.resource-upload-form > input { width: 100%; height: 46px; padding: 0 13px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: #fcfcfa; outline: none; }
+.resource-upload-form > input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(35,102,162,.1); }
+.file-picker { position: relative; min-height: 145px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 16px 0; padding: 18px; border: 1.5px dashed #a9c2d1; border-radius: 15px; color: var(--navy); background: #f5fafc; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
+.file-picker:hover, .file-picker:focus-within { border-color: var(--blue); background: #eff8fd; }
+.file-picker input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.file-picker-icon { width: 34px; height: 34px; display: grid; place-items: center; margin-bottom: 6px; border-radius: 50%; color: white; background: var(--blue); font-size: 21px; }
+.file-picker strong { font-size: 13px; }
+.file-picker small { color: var(--muted); font-size: 10px; }
+.selected-file { max-width: 100%; margin-top: 7px; overflow: hidden; color: var(--green); font-size: 11px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.upload-button { width: 100%; min-height: 46px; color: white; background: var(--navy); }
+.upload-button:hover { background: var(--blue); }
+.upload-button:disabled { opacity: .65; cursor: wait; transform: none; }
+.upload-status { min-height: 18px; margin: 8px 0 -6px; color: var(--green); font-size: 11px; text-align: center; }
+.upload-status.error { color: #b33a3a; }
+.library-heading { display: flex; align-items: end; justify-content: space-between; margin: 56px 0 18px; padding-bottom: 16px; border-bottom: 1px solid #cadce4; }
+.library-heading > span { color: var(--muted); font-size: 12px; font-weight: 600; }
+.resource-library { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.resource-empty { grid-column: 1 / -1; padding: 38px 20px; border: 1px dashed #b8cdd7; border-radius: var(--radius); color: var(--muted); text-align: center; background: rgba(255,255,255,.45); }
+.resource-empty span { display: block; margin-bottom: 7px; font-size: 28px; }
+.resource-empty strong { display: block; color: var(--navy); }
+.resource-empty p { margin: 3px 0 0; font-size: 12px; }
+.resource-card { overflow: hidden; border: 1px solid #d6e2e7; border-radius: 18px; background: white; box-shadow: 0 12px 32px rgba(18,52,91,.06); }
+.resource-preview { height: 170px; display: grid; place-items: center; overflow: hidden; background: #dfeaf0; }
+.resource-preview img { width: 100%; height: 100%; object-fit: cover; }
+.pdf-preview { color: #ad2d2d; text-align: center; }
+.pdf-preview span { display: block; font-size: 42px; line-height: 1; }
+.pdf-preview small { display: block; margin-top: 8px; color: var(--muted); font-weight: 700; letter-spacing: 1px; }
+.resource-body { padding: 18px; }
+.resource-kind { display: inline-block; margin-bottom: 9px; padding: 4px 8px; border-radius: 999px; color: var(--blue); background: #edf5fc; font-size: 9px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
+.resource-body h4 { margin: 0 0 5px; overflow-wrap: anywhere; font-size: 16px; line-height: 1.3; }
+.resource-meta { margin: 0; overflow: hidden; color: var(--muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.resource-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+.resource-actions a, .resource-remove { border: 0; color: var(--blue); background: none; font-size: 11px; font-weight: 700; cursor: pointer; }
+.resource-remove { color: #a34b4b; }
+.storage-note { display: flex; gap: 7px; margin: 18px 0 0; color: var(--muted); font-size: 10px; }
+
 .timetable-section { color: white; background: var(--navy-deep); }
 .section-heading.light > p { color: #afbece; }
 .timetable-layout { display: grid; grid-template-columns: 1fr .8fr; gap: 70px; align-items: start; }
@@ -230,6 +275,7 @@ footer { color: #c5d1dd; background: #071b31; }
   .program-grid { grid-template-columns: 1fr; }
   .program-card { min-height: 300px; }
   .program-card.feature { margin-top: 0; }
+  .resource-library { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .timetable-layout, .contact-layout { grid-template-columns: 1fr; gap: 55px; }
   .contact-list { grid-template-columns: 1fr; }
   .footer-main { grid-template-columns: 1fr; padding: 50px 0; }
@@ -250,6 +296,9 @@ footer { color: #c5d1dd; background: #071b31; }
   .admin-form { grid-template-columns: 1fr; }
   .description-field { grid-column: auto; }
   .admin-submit { width: 100%; }
+  .upload-grid, .resource-library { grid-template-columns: 1fr; }
+  .upload-card { padding: 24px 20px; }
+  .resource-preview { height: 210px; }
   .enquiry-card { padding: 25px 20px; }
 }
 
