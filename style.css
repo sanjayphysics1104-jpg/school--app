@@ -164,7 +164,11 @@ h1 em, h2 em { color: var(--sun); font-family: "Fraunces", serif; font-weight: 7
 .file-picker-icon { width: 34px; height: 34px; display: grid; place-items: center; margin-bottom: 6px; border-radius: 50%; color: white; background: var(--blue); font-size: 21px; }
 .file-picker strong { font-size: 13px; }
 .file-picker small { color: var(--muted); font-size: 10px; }
-.selected-file { max-width: 100%; margin-top: 7px; overflow: hidden; color: var(--green); font-size: 11px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.selected-file-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: -7px 0 16px; padding: 10px 12px; border: 1px solid #cfe0e6; border-radius: 10px; background: #f8fbfc; }
+.selected-file-row[hidden] { display: none; }
+.selected-file { min-width: 0; overflow: hidden; color: var(--green); font-size: 11px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.selected-file-remove { flex: 0 0 auto; padding: 5px 8px; border: 0; border-radius: 7px; color: #9f3030; background: #fbecec; font-size: 10px; font-weight: 800; cursor: pointer; }
+.selected-file-remove:hover, .selected-file-remove:focus-visible { color: white; background: #a83d3d; }
 .upload-button { width: 100%; min-height: 46px; color: white; background: var(--navy); }
 .upload-button:hover { background: var(--blue); }
 .upload-button:disabled { opacity: .65; cursor: wait; transform: none; }
@@ -199,6 +203,7 @@ h1 em, h2 em { color: var(--sun); font-family: "Fraunces", serif; font-weight: 7
 .pdf-form-field input, .library-toolbar input { width: 100%; height: 46px; padding: 0 13px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: #fcfcfa; outline: none; }
 .pdf-form-field input:focus, .library-toolbar input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(35,102,162,.1); }
 .pdf-form-field small { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; }
+.pdf-form-field .selected-file-row { margin: 9px 0 0; }
 .pdf-file-field, .pdf-link-field { grid-column: 1 / -1; }
 .pdf-divider { position: relative; grid-column: 1 / -1; height: 16px; border-bottom: 1px solid var(--line); text-align: center; }
 .pdf-divider span { position: relative; top: 5px; padding: 0 10px; color: var(--muted); background: white; font-size: 10px; text-transform: uppercase; }
@@ -220,7 +225,8 @@ h1 em, h2 em { color: var(--sun); font-family: "Fraunces", serif; font-weight: 7
 .pdf-card-copy strong { overflow-wrap: anywhere; line-height: 1.3; }
 .pdf-card-copy span { margin-top: 7px; color: var(--muted); font-size: 10px; }
 .pdf-open-arrow { color: var(--blue); font-weight: 800; }
-.pdf-delete { position: absolute; right: 15px; bottom: 10px; padding: 3px 6px; border: 0; background: white; font-size: 10px; cursor: pointer; }
+.pdf-delete { position: absolute; right: 15px; bottom: 10px; padding: 4px 7px; border: 0; border-radius: 7px; color: #9f3030; background: #fbecec; font-size: 10px; font-weight: 800; cursor: pointer; }
+.pdf-delete:hover, .pdf-delete:focus-visible { color: white; background: #a83d3d; }
 
 .app-dialog { padding: 0; border: 0; border-radius: 22px; color: var(--ink); background: white; box-shadow: 0 30px 90px rgba(0,0,0,.35); }
 .app-dialog::backdrop { background: rgba(4,18,34,.75); backdrop-filter: blur(5px); }

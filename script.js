@@ -32,6 +32,9 @@ const pdfSearch = document.querySelector("#pdf-search");
 const pinDialog = document.querySelector("#pin-dialog");
 const pinForm = document.querySelector("#pin-form");
 const pinStatus = document.querySelector("#pin-status");
+const pinDialogTitle = document.querySelector("#pin-dialog-title");
+const pinDialogMessage = document.querySelector("#pin-dialog-message");
+const pinSubmitButton = document.querySelector("#pin-submit-button");
 const changePinForm = document.querySelector("#change-pin-form");
 const changePinStatus = document.querySelector("#change-pin-status");
 const viewerDialog = document.querySelector("#pdf-viewer-dialog");
@@ -41,6 +44,7 @@ const viewerOpenNew = document.querySelector("#viewer-open-new");
 
 let deferredInstallPrompt;
 let pendingAdminTarget = null;
+let pendingAdminAction = null;
 let isAdmin = sessionStorage.getItem("sunshine-admin-session") === "active";
 let resources = [];
 let pdfs = [];
@@ -151,8 +155,31 @@ function updateAdminUI() {
 function requestAdmin(targetId = null) {
   if (isAdmin) { if (targetId) revealAdminPanel(targetId); return; }
   pendingAdminTarget = targetId;
+  pendingAdminAction = null;
+  setPinDialogCopy();
   showPinView("login");
   pinStatus.textContent = "";
+  pinForm.reset();
+  pinDialog.showModal();
+  window.setTimeout(() => document.querySelector("#admin-pin").focus(), 50);
+}
+
+function setPinDialogCopy(actionLabel = "") {
+  const isDeletion = Boolean(actionLabel);
+  pinDialogTitle.textContent = isDeletion ? "Confirm removal" : "Admin verification";
+  pinDialogMessage.textContent = isDeletion
+    ? `Enter the 4-digit admin passcode to remove ${actionLabel}.`
+    : "Enter the 4-digit admin passcode to manage school content.";
+  pinSubmitButton.textContent = isDeletion ? "Verify & remove" : "Unlock admin controls";
+  document.querySelector("#show-change-pin").hidden = isDeletion;
+  document.querySelector("#admin-signout").hidden = isDeletion || !isAdmin;
+}
+
+function requestProtectedRemoval(actionLabel, action) {
+  pendingAdminTarget = null;
+  pendingAdminAction = action;
+  setPinDialogCopy(actionLabel);
+  showPinView("login");
   pinForm.reset();
   pinDialog.showModal();
   window.setTimeout(() => document.querySelector("#admin-pin").focus(), 50);
@@ -187,13 +214,15 @@ document.querySelectorAll("[data-admin-action]").forEach((button) => button.addE
 document.querySelectorAll("[data-admin-login]").forEach((button) => button.addEventListener("click", () => {
   if (isAdmin) {
     pendingAdminTarget = null;
+    pendingAdminAction = null;
+    setPinDialogCopy();
     showPinView("login");
     pinForm.reset();
     pinDialog.showModal();
   } else requestAdmin();
 }));
 
-document.querySelector("#pin-dialog-close").addEventListener("click", () => pinDialog.close());
+document.querySelector("#pin-dialog-close").addEventListener("click", () => { pendingAdminAction = null; pinDialog.close(); });
 document.querySelector("#show-change-pin").addEventListener("click", () => showPinView("change"));
 document.querySelector("#back-to-pin-login").addEventListener("click", () => { showPinView("login"); document.querySelector("#admin-pin").focus(); });
 document.querySelector("#admin-signout").addEventListener("click", () => {
@@ -217,7 +246,14 @@ pinForm.addEventListener("submit", async (event) => {
   pinDialog.close();
   updateAdminUI();
   if (pendingAdminTarget) revealAdminPanel(pendingAdminTarget);
+  const verifiedAction = pendingAdminAction;
   pendingAdminTarget = null;
+  pendingAdminAction = null;
+  setPinDialogCopy();
+  if (verifiedAction) {
+    try { await verifiedAction(); }
+    catch (error) { window.alert(error.message || "The file could not be removed from device storage."); }
+  }
 });
 
 changePinForm.addEventListener("submit", async (event) => {
@@ -298,14 +334,13 @@ function renderResources() {
     const card = document.createElement("article");
     card.className = "resource-card";
     const previewContent = resource.mime.startsWith("image/") ? `<img src="${url}" alt="Preview of ${escapeHTML(resource.title)}" loading="lazy">` : '<span class="pdf-preview"><span aria-hidden="true">▤</span><small>PDF DOCUMENT</small></span>';
-    card.innerHTML = `<button class="resource-preview open-resource" type="button" aria-label="Open ${escapeHTML(resource.title)}">${previewContent}</button><div class="resource-body"><span class="resource-kind">${resource.kind === "question-paper" ? "Question Paper" : "Study Notes"}</span><h4>${escapeHTML(resource.title)}</h4><p class="resource-meta">${escapeHTML(resource.name)} · ${escapeHTML(resource.date)}</p><div class="resource-actions"><button class="open-resource" type="button">${resource.mime === "application/pdf" ? "Read PDF" : "View image"} →</button>${isAdmin ? '<button class="resource-remove delete-control" type="button">Delete</button>' : ""}</div></div>`;
+    card.innerHTML = `<button class="resource-preview open-resource" type="button" aria-label="Open ${escapeHTML(resource.title)}">${previewContent}</button><div class="resource-body"><span class="resource-kind">${resource.kind === "question-paper" ? "Question Paper" : "Study Notes"}</span><h4>${escapeHTML(resource.title)}</h4><p class="resource-meta">${escapeHTML(resource.name)} · ${escapeHTML(resource.date)}</p><div class="resource-actions"><button class="open-resource" type="button">${resource.mime === "application/pdf" ? "Read PDF" : "View image"} →</button><button class="resource-remove delete-control" type="button" aria-label="Delete ${escapeHTML(resource.title)}"><span aria-hidden="true">×</span> Delete</button></div></div>`;
     card.querySelectorAll(".open-resource").forEach((button) => button.addEventListener("click", () => resource.mime === "application/pdf" ? openPdfViewer(resource.title, resource.blob) : window.open(url, "_blank", "noopener,noreferrer")));
-    card.querySelector(".resource-remove")?.addEventListener("click", async () => {
-      if (!isAdmin) return;
+    card.querySelector(".resource-remove").addEventListener("click", () => requestProtectedRemoval(`“${resource.title}”`, async () => {
       await deleteItem("resources", resource.id);
       resources = resources.filter((item) => item.id !== resource.id);
       renderResources();
-    });
+    }));
     resourceLibrary.append(card);
   });
 }
@@ -313,9 +348,26 @@ function renderResources() {
 resourceForms.forEach((resourceForm) => {
   const fileInput = resourceForm.querySelector('input[type="file"]');
   const fileName = resourceForm.querySelector("[data-file-name]");
+  const selectedFile = resourceForm.querySelector("[data-selected-file]");
+  const removeSelected = resourceForm.querySelector(".selected-file-remove");
   const status = resourceForm.querySelector(".upload-status");
   const submitButton = resourceForm.querySelector('button[type="submit"]');
-  fileInput.addEventListener("change", () => { fileName.textContent = fileInput.files[0]?.name || "No file selected"; status.textContent = ""; });
+  const updateSelectedFile = () => {
+    const file = fileInput.files[0];
+    fileName.textContent = file?.name || "";
+    selectedFile.hidden = !file;
+  };
+  fileInput.addEventListener("change", () => { updateSelectedFile(); status.textContent = ""; });
+  removeSelected.addEventListener("click", () => {
+    const name = fileInput.files[0]?.name;
+    if (!name) return;
+    requestProtectedRemoval(`the selected file “${name}”`, () => {
+      fileInput.value = "";
+      updateSelectedFile();
+      status.textContent = "Selected file removed.";
+      status.classList.remove("error");
+    });
+  });
   resourceForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!isAdmin) return requestAdmin(resourceForm.id);
@@ -332,7 +384,7 @@ resourceForms.forEach((resourceForm) => {
       resources.unshift(item);
       renderResources();
       resourceForm.reset();
-      fileName.textContent = "No file selected";
+      updateSelectedFile();
       status.textContent = "Uploaded and saved on this device.";
     } catch (error) {
       status.textContent = error.name === "QuotaExceededError" ? "Device storage is full. Remove older files or free device space." : error.message;
@@ -360,9 +412,13 @@ function renderPdfs() {
   visible.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).forEach((pdf) => {
     const card = document.createElement("article");
     card.className = "pdf-library-card";
-    card.innerHTML = `<button class="pdf-card-open" type="button"><span class="pdf-book-icon" aria-hidden="true">PDF</span><span class="pdf-card-copy"><small>${escapeHTML(pdf.category || "School Library")}</small><strong>${escapeHTML(pdf.title)}</strong><span>${pdf.blob ? formatBytes(pdf.blob.size) : "Online document"} · ${escapeHTML(pdf.date)}</span></span><span class="pdf-open-arrow" aria-hidden="true">→</span></button>${isAdmin ? `<button class="pdf-delete delete-control" type="button" aria-label="Delete ${escapeHTML(pdf.title)}">Delete</button>` : ""}`;
+    card.innerHTML = `<button class="pdf-card-open" type="button"><span class="pdf-book-icon" aria-hidden="true">PDF</span><span class="pdf-card-copy"><small>${escapeHTML(pdf.category || "School Library")}</small><strong>${escapeHTML(pdf.title)}</strong><span>${pdf.blob ? formatBytes(pdf.blob.size) : "Online document"} · ${escapeHTML(pdf.date)}</span></span><span class="pdf-open-arrow" aria-hidden="true">→</span></button><button class="pdf-delete delete-control" type="button" aria-label="Delete ${escapeHTML(pdf.title)}"><span aria-hidden="true">×</span> Delete</button>`;
     card.querySelector(".pdf-card-open").addEventListener("click", () => openPdfViewer(pdf.title, pdf.blob || pdf.url));
-    card.querySelector(".pdf-delete")?.addEventListener("click", async () => { if (!isAdmin) return; await deleteItem("pdfs", pdf.id); pdfs = pdfs.filter((item) => item.id !== pdf.id); renderPdfs(); });
+    card.querySelector(".pdf-delete").addEventListener("click", () => requestProtectedRemoval(`“${pdf.title}”`, async () => {
+      await deleteItem("pdfs", pdf.id);
+      pdfs = pdfs.filter((item) => item.id !== pdf.id);
+      renderPdfs();
+    }));
     pdfGrid.append(card);
   });
 }
@@ -386,12 +442,34 @@ pdfForm.addEventListener("submit", async (event) => {
     pdfs.unshift(item);
     renderPdfs();
     pdfForm.reset();
+    updatePdfSelectedFile();
     status.textContent = "PDF saved to the library.";
     if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
   } catch (error) {
     status.textContent = error.name === "QuotaExceededError" ? "Device storage is full. Free space or remove an older PDF." : error.message;
     status.classList.add("error");
   } finally { submit.disabled = false; }
+});
+
+const pdfFileInput = pdfForm.elements.file;
+const pdfSelectedFile = pdfForm.querySelector("[data-selected-file]");
+const pdfSelectedName = pdfForm.querySelector("[data-file-name]");
+function updatePdfSelectedFile() {
+  const file = pdfFileInput.files[0];
+  pdfSelectedName.textContent = file?.name || "";
+  pdfSelectedFile.hidden = !file;
+}
+pdfFileInput.addEventListener("change", () => { updatePdfSelectedFile(); document.querySelector("#pdf-upload-status").textContent = ""; });
+pdfForm.querySelector(".selected-file-remove").addEventListener("click", () => {
+  const name = pdfFileInput.files[0]?.name;
+  if (!name) return;
+  requestProtectedRemoval(`the selected PDF “${name}”`, () => {
+    pdfFileInput.value = "";
+    updatePdfSelectedFile();
+    const status = document.querySelector("#pdf-upload-status");
+    status.textContent = "Selected PDF removed.";
+    status.classList.remove("error");
+  });
 });
 
 pdfSearch.addEventListener("input", renderPdfs);

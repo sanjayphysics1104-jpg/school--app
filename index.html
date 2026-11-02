@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
   <title>The Sunshine Academy</title>
 </head>
 <body>
@@ -165,8 +165,8 @@
                 <span class="file-picker-icon" aria-hidden="true">＋</span>
                 <strong>Choose file or take photo</strong>
                 <small>Image or PDF · stored in the device library</small>
-                <span class="selected-file" data-file-name>No file selected</span>
               </label>
+              <div class="selected-file-row" data-selected-file hidden><span class="selected-file" data-file-name></span><button class="selected-file-remove" type="button" aria-label="Remove selected file"><span aria-hidden="true">×</span> Remove</button></div>
               <button class="button upload-button" type="submit">Upload paper <span aria-hidden="true">→</span></button>
               <p class="upload-status" role="status" aria-live="polite"></p>
             </form>
@@ -185,8 +185,8 @@
                 <span class="file-picker-icon" aria-hidden="true">＋</span>
                 <strong>Choose file or take photo</strong>
                 <small>Image or PDF · stored in the device library</small>
-                <span class="selected-file" data-file-name>No file selected</span>
               </label>
+              <div class="selected-file-row" data-selected-file hidden><span class="selected-file" data-file-name></span><button class="selected-file-remove" type="button" aria-label="Remove selected file"><span aria-hidden="true">×</span> Remove</button></div>
               <button class="button upload-button" type="submit">Upload notes <span aria-hidden="true">→</span></button>
               <p class="upload-status" role="status" aria-live="polite"></p>
             </form>
@@ -211,7 +211,7 @@
           <form id="pdf-library-form">
             <div class="pdf-form-field"><label for="pdf-title">PDF title</label><input id="pdf-title" name="title" type="text" maxlength="100" placeholder="e.g. Class VIII Science Book" required></div>
             <div class="pdf-form-field"><label for="pdf-category">Category</label><input id="pdf-category" name="category" type="text" maxlength="40" placeholder="e.g. Science"></div>
-            <div class="pdf-form-field pdf-file-field"><label for="pdf-file">Choose PDF / camera file</label><input id="pdf-file" name="file" type="file" accept="application/pdf,.pdf" capture="environment"><small>Large, multi-page PDFs are saved directly in IndexedDB.</small></div>
+            <div class="pdf-form-field pdf-file-field"><label for="pdf-file">Choose PDF / camera file</label><input id="pdf-file" name="file" type="file" accept="application/pdf,.pdf" capture="environment"><small>Large, multi-page PDFs are saved directly in IndexedDB.</small><div class="selected-file-row" data-selected-file hidden><span class="selected-file" data-file-name></span><button class="selected-file-remove" type="button" aria-label="Remove selected PDF"><span aria-hidden="true">×</span> Remove</button></div></div>
             <div class="pdf-divider"><span>or</span></div>
             <div class="pdf-form-field pdf-link-field"><label for="pdf-link">WhatsApp / Google Drive / direct PDF link</label><input id="pdf-link" name="url" type="url" inputmode="url" placeholder="https://drive.google.com/..."><small>Use a publicly accessible PDF or Drive sharing link.</small></div>
             <button class="button upload-button" type="submit">Save to library <span aria-hidden="true">→</span></button>
@@ -296,12 +296,12 @@
       <div id="pin-login-view">
         <span class="dialog-icon" aria-hidden="true">🔒</span>
         <p class="admin-kicker">Director / Principal only</p>
-        <h2>Admin verification</h2>
-        <p>Enter the 4-digit admin passcode to manage school content.</p>
+        <h2 id="pin-dialog-title">Admin verification</h2>
+        <p id="pin-dialog-message">Enter the 4-digit admin passcode to manage school content.</p>
         <form id="pin-form">
           <label for="admin-pin">Admin passcode</label>
           <input id="admin-pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="one-time-code" placeholder="••••" required>
-          <button class="button admin-submit" type="submit">Unlock admin controls</button>
+          <button class="button admin-submit" id="pin-submit-button" type="submit">Unlock admin controls</button>
           <p class="dialog-status" id="pin-status" role="alert"></p>
         </form>
         <div class="pin-options"><button id="show-change-pin" type="button">Change PIN</button><button id="admin-signout" type="button" hidden>Exit admin mode</button></div>
@@ -333,6 +333,6 @@
     </div>
   </dialog>
 
-  <script src="script.js?v=6" defer></script>
+  <script src="script.js?v=7" defer></script>
 </body>
 </html>
