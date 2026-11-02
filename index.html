@@ -24,12 +24,12 @@
         <span></span><span></span><span></span><span class="sr-only">Open menu</span>
       </button>
       <div class="nav-links" id="nav-links">
-        <a href="#notices">Notices</a>
-        <a href="#academics">Academics</a>
-        <a href="#resources">Resources</a>
-        <a href="#timetable">Timetable</a>
+        <a href="#notices">Notice Board</a>
+        <a href="#question-papers">Question Papers</a>
+        <a href="#study-notes">Study Notes</a>
+        <a href="#pdf-library">PDF Library</a>
         <a href="#contact">Contact</a>
-        <a class="nav-cta" href="tel:+917488875827">Call school</a>
+        <button class="nav-cta admin-access-button" type="button" data-admin-login>Admin access</button>
       </div>
     </nav>
 
@@ -77,9 +77,9 @@
       <div class="shell">
         <div class="section-heading reveal">
           <div><p class="eyebrow dark"><span></span> Stay informed</p><h2>Notice board</h2></div>
-          <p>Important school updates, homework reminders and circulars—all in one place.</p>
+          <div class="heading-actions"><p>Important school updates, homework reminders and circulars—all in one place.</p><button class="button admin-action" type="button" data-admin-action="notice-form">Add Notice</button></div>
         </div>
-        <div class="admin-panel reveal" id="admin">
+        <div class="admin-panel admin-only-panel" id="notice-form" hidden>
           <div class="admin-intro">
             <span class="admin-icon" aria-hidden="true">＋</span>
             <div>
@@ -151,38 +151,40 @@
           <p>Capture a page with your camera or choose an image or PDF already saved on your device.</p>
         </div>
         <div class="upload-grid">
-          <article class="upload-card reveal">
+          <article class="upload-card reveal" id="question-papers">
             <div class="upload-card-heading">
               <span class="upload-icon" aria-hidden="true">Q</span>
               <div><p class="upload-kicker">Assessment</p><h3>Question Paper</h3></div>
             </div>
-            <form class="resource-upload-form" data-kind="question-paper">
+            <button class="button admin-action resource-unlock" type="button" data-admin-action="paper-upload-form">Upload Question Paper</button>
+            <form class="resource-upload-form admin-only-panel" id="paper-upload-form" data-kind="question-paper" hidden>
               <label for="paper-title">Paper title</label>
               <input id="paper-title" name="title" type="text" maxlength="80" placeholder="e.g. Class VII Science Test" required>
               <label class="file-picker" for="paper-file">
                 <input id="paper-file" name="file" type="file" accept="image/*,application/pdf" capture="environment" required>
                 <span class="file-picker-icon" aria-hidden="true">＋</span>
                 <strong>Choose file or take photo</strong>
-                <small>Image or PDF · up to 2 MB</small>
+                <small>Image or PDF · stored in the device library</small>
                 <span class="selected-file" data-file-name>No file selected</span>
               </label>
               <button class="button upload-button" type="submit">Upload paper <span aria-hidden="true">→</span></button>
               <p class="upload-status" role="status" aria-live="polite"></p>
             </form>
           </article>
-          <article class="upload-card notes-card reveal delay-1">
+          <article class="upload-card notes-card reveal delay-1" id="study-notes">
             <div class="upload-card-heading">
               <span class="upload-icon notes" aria-hidden="true">N</span>
               <div><p class="upload-kicker">Revision</p><h3>Study Notes</h3></div>
             </div>
-            <form class="resource-upload-form" data-kind="study-notes">
+            <button class="button admin-action resource-unlock" type="button" data-admin-action="notes-upload-form">Upload Notes</button>
+            <form class="resource-upload-form admin-only-panel" id="notes-upload-form" data-kind="study-notes" hidden>
               <label for="notes-title">Notes title</label>
               <input id="notes-title" name="title" type="text" maxlength="80" placeholder="e.g. Fractions revision notes" required>
               <label class="file-picker" for="notes-file">
                 <input id="notes-file" name="file" type="file" accept="image/*,application/pdf" capture="environment" required>
                 <span class="file-picker-icon" aria-hidden="true">＋</span>
                 <strong>Choose file or take photo</strong>
-                <small>Image or PDF · up to 2 MB</small>
+                <small>Image or PDF · stored in the device library</small>
                 <span class="selected-file" data-file-name>No file selected</span>
               </label>
               <button class="button upload-button" type="submit">Upload notes <span aria-hidden="true">→</span></button>
@@ -195,7 +197,29 @@
           <span id="resource-count">0 files</span>
         </div>
         <div class="resource-library" id="resource-library" aria-live="polite"></div>
-        <p class="storage-note"><span aria-hidden="true">ⓘ</span> Files are stored only in this browser. Avoid uploading confidential information and keep your original copy.</p>
+        <p class="storage-note"><span aria-hidden="true">ⓘ</span> Files are stored in IndexedDB on this device. Available capacity depends on the browser and device; keep your original copies.</p>
+      </div>
+    </section>
+
+    <section class="section pdf-library-section" id="pdf-library">
+      <div class="shell">
+        <div class="section-heading reveal">
+          <div><p class="eyebrow dark"><span></span> Digital bookshelf</p><h2>PDF Library</h2></div>
+          <div class="heading-actions"><p>Open books and documents in a responsive, multi-page viewer without leaving the app.</p><button class="button admin-action" type="button" data-admin-action="pdf-upload-panel">Add PDF</button></div>
+        </div>
+        <div class="pdf-upload-panel admin-only-panel" id="pdf-upload-panel" hidden>
+          <form id="pdf-library-form">
+            <div class="pdf-form-field"><label for="pdf-title">PDF title</label><input id="pdf-title" name="title" type="text" maxlength="100" placeholder="e.g. Class VIII Science Book" required></div>
+            <div class="pdf-form-field"><label for="pdf-category">Category</label><input id="pdf-category" name="category" type="text" maxlength="40" placeholder="e.g. Science"></div>
+            <div class="pdf-form-field pdf-file-field"><label for="pdf-file">Choose PDF / camera file</label><input id="pdf-file" name="file" type="file" accept="application/pdf,.pdf" capture="environment"><small>Large, multi-page PDFs are saved directly in IndexedDB.</small></div>
+            <div class="pdf-divider"><span>or</span></div>
+            <div class="pdf-form-field pdf-link-field"><label for="pdf-link">WhatsApp / Google Drive / direct PDF link</label><input id="pdf-link" name="url" type="url" inputmode="url" placeholder="https://drive.google.com/..."><small>Use a publicly accessible PDF or Drive sharing link.</small></div>
+            <button class="button upload-button" type="submit">Save to library <span aria-hidden="true">→</span></button>
+            <p class="upload-status" id="pdf-upload-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+        <div class="library-toolbar"><div><strong id="pdf-count">0 PDFs</strong><span>Scrollable device library</span></div><input id="pdf-search" type="search" placeholder="Search PDFs or categories" aria-label="Search PDF library"></div>
+        <div class="pdf-library-grid" id="pdf-library-grid" aria-live="polite"></div>
       </div>
     </section>
 
@@ -265,6 +289,27 @@
     </div>
     <div class="shell footer-bottom"><p>© <span id="year"></span> The Sunshine Academy. All rights reserved.</p><button id="install-app" type="button" hidden>Install app</button><a href="#home">Back to top ↑</a></div>
   </footer>
+
+  <dialog class="app-dialog pin-dialog" id="pin-dialog">
+    <form method="dialog" id="pin-form">
+      <button class="dialog-close" value="cancel" aria-label="Close">×</button>
+      <span class="dialog-icon" aria-hidden="true">🔒</span>
+      <p class="admin-kicker">Director / Principal only</p>
+      <h2>Admin verification</h2>
+      <p>Enter the 4-digit admin passcode to manage school content.</p>
+      <label for="admin-pin">Admin passcode</label>
+      <input id="admin-pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="one-time-code" placeholder="••••" required>
+      <button class="button admin-submit" type="submit">Unlock admin controls</button>
+      <p class="dialog-status" id="pin-status" role="alert"></p>
+    </form>
+  </dialog>
+
+  <dialog class="app-dialog viewer-dialog" id="pdf-viewer-dialog">
+    <div class="viewer-shell">
+      <div class="viewer-bar"><div><span>PDF viewer</span><strong id="viewer-title">Document</strong></div><div><a id="viewer-open-new" href="#" target="_blank" rel="noopener">Open separately ↗</a><button class="dialog-close" id="viewer-close" type="button" aria-label="Close PDF viewer">×</button></div></div>
+      <iframe id="pdf-viewer-frame" title="Scrollable PDF viewer"></iframe>
+    </div>
+  </dialog>
 
   <script src="script.js" defer></script>
 </body>
