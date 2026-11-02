@@ -1,5 +1,5 @@
 const defaultNotices = [
-  { id: "admission-2026", type: "notice", label: "Admission", date: "01 Nov 2026", title: "Admissions open for the 2026–27 session", text: "Applications are invited for Nursery to Class VIII. Contact the school office for availability.", featured: true },
+  { id: "admission-open", type: "notice", label: "Admission", date: "01 Nov 2026", title: "Admission Open", text: "Applications are invited for Nursery to Class VIII. Contact the school office for availability.", featured: true },
   { id: "weekly-practice", type: "homework", label: "Homework", date: "31 Oct 2026", title: "Weekly practice reminder", text: "Students should complete the assigned English and Mathematics practice before Monday." },
   { id: "parent-meeting", type: "circular", label: "Circular", date: "28 Oct 2026", title: "Parent–teacher meeting", text: "The next parent–teacher interaction will be held class-wise. Timings will be shared by teachers." },
   { id: "winter-timing", type: "notice", label: "School update", date: "25 Oct 2026", title: "Winter timing update", text: "Revised winter timings will be announced soon. Please check the notice board for confirmation." }
@@ -10,7 +10,8 @@ const DB_VERSION = 2;
 const NOTICE_KEY = "sunshine-academy-admin-updates";
 const HIDDEN_NOTICE_KEY = "sunshine-academy-hidden-notices";
 const LEGACY_RESOURCE_KEY = "sunshine-academy-resources";
-const ADMIN_PIN_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+const PIN_STORAGE_KEY = "sunshine-academy-admin-pin-hash";
+const DEFAULT_ADMIN_PIN_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
 
 const noticeList = document.querySelector("#notice-list");
 const filters = document.querySelectorAll(".filter");
@@ -31,6 +32,8 @@ const pdfSearch = document.querySelector("#pdf-search");
 const pinDialog = document.querySelector("#pin-dialog");
 const pinForm = document.querySelector("#pin-form");
 const pinStatus = document.querySelector("#pin-status");
+const changePinForm = document.querySelector("#change-pin-form");
+const changePinStatus = document.querySelector("#change-pin-status");
 const viewerDialog = document.querySelector("#pdf-viewer-dialog");
 const viewerFrame = document.querySelector("#pdf-viewer-frame");
 const viewerTitle = document.querySelector("#viewer-title");
@@ -138,7 +141,8 @@ async function sha256(value) {
 
 function updateAdminUI() {
   document.body.classList.toggle("admin-mode", isAdmin);
-  document.querySelectorAll("[data-admin-login]").forEach((button) => { button.textContent = isAdmin ? "Exit admin" : "Admin access"; });
+  document.querySelectorAll("[data-admin-login]").forEach((button) => { button.textContent = isAdmin ? "Admin settings" : "Admin access"; });
+  document.querySelector("#admin-signout").hidden = !isAdmin;
   renderNotices();
   renderResources();
   renderPdfs();
@@ -147,10 +151,28 @@ function updateAdminUI() {
 function requestAdmin(targetId = null) {
   if (isAdmin) { if (targetId) revealAdminPanel(targetId); return; }
   pendingAdminTarget = targetId;
+  showPinView("login");
   pinStatus.textContent = "";
   pinForm.reset();
   pinDialog.showModal();
   window.setTimeout(() => document.querySelector("#admin-pin").focus(), 50);
+}
+
+function showPinView(view) {
+  const changing = view === "change";
+  document.querySelector("#pin-login-view").hidden = changing;
+  document.querySelector("#pin-change-view").hidden = !changing;
+  pinStatus.textContent = "";
+  changePinStatus.textContent = "";
+  changePinStatus.classList.remove("success");
+  if (changing) {
+    changePinForm.reset();
+    window.setTimeout(() => document.querySelector("#current-admin-pin").focus(), 50);
+  }
+}
+
+function currentPinHash() {
+  return localStorage.getItem(PIN_STORAGE_KEY) || DEFAULT_ADMIN_PIN_HASH;
 }
 
 function revealAdminPanel(targetId) {
@@ -164,17 +186,28 @@ function revealAdminPanel(targetId) {
 document.querySelectorAll("[data-admin-action]").forEach((button) => button.addEventListener("click", () => requestAdmin(button.dataset.adminAction)));
 document.querySelectorAll("[data-admin-login]").forEach((button) => button.addEventListener("click", () => {
   if (isAdmin) {
-    isAdmin = false;
-    sessionStorage.removeItem("sunshine-admin-session");
-    document.querySelectorAll(".admin-only-panel").forEach((panel) => { panel.hidden = true; });
-    updateAdminUI();
+    pendingAdminTarget = null;
+    showPinView("login");
+    pinForm.reset();
+    pinDialog.showModal();
   } else requestAdmin();
 }));
+
+document.querySelector("#pin-dialog-close").addEventListener("click", () => pinDialog.close());
+document.querySelector("#show-change-pin").addEventListener("click", () => showPinView("change"));
+document.querySelector("#back-to-pin-login").addEventListener("click", () => { showPinView("login"); document.querySelector("#admin-pin").focus(); });
+document.querySelector("#admin-signout").addEventListener("click", () => {
+  isAdmin = false;
+  sessionStorage.removeItem("sunshine-admin-session");
+  document.querySelectorAll(".admin-only-panel").forEach((panel) => { panel.hidden = true; });
+  pinDialog.close();
+  updateAdminUI();
+});
 
 pinForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const pin = String(new FormData(pinForm).get("pin") || "");
-  if (!/^\d{4}$/.test(pin) || await sha256(pin) !== ADMIN_PIN_HASH) {
+  if (!/^\d{4}$/.test(pin) || await sha256(pin) !== currentPinHash()) {
     pinStatus.textContent = "Incorrect passcode. Please try again.";
     pinForm.querySelector("input").select();
     return;
@@ -185,6 +218,36 @@ pinForm.addEventListener("submit", async (event) => {
   updateAdminUI();
   if (pendingAdminTarget) revealAdminPanel(pendingAdminTarget);
   pendingAdminTarget = null;
+});
+
+changePinForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = new FormData(changePinForm);
+  const currentPin = String(data.get("currentPin") || "");
+  const newPin = String(data.get("newPin") || "");
+  const confirmPin = String(data.get("confirmPin") || "");
+  if (!/^\d{4}$/.test(currentPin) || await sha256(currentPin) !== currentPinHash()) {
+    changePinStatus.textContent = "The current PIN is incorrect.";
+    document.querySelector("#current-admin-pin").select();
+    return;
+  }
+  if (!/^\d{4}$/.test(newPin)) {
+    changePinStatus.textContent = "The new PIN must contain exactly 4 digits.";
+    document.querySelector("#new-admin-pin").select();
+    return;
+  }
+  if (newPin !== confirmPin) {
+    changePinStatus.textContent = "The new PIN entries do not match.";
+    document.querySelector("#confirm-admin-pin").select();
+    return;
+  }
+  localStorage.setItem(PIN_STORAGE_KEY, await sha256(newPin));
+  isAdmin = true;
+  sessionStorage.setItem("sunshine-admin-session", "active");
+  changePinStatus.classList.add("success");
+  changePinStatus.textContent = "PIN changed successfully.";
+  updateAdminUI();
+  window.setTimeout(() => { pinDialog.close(); showPinView("login"); }, 900);
 });
 
 filters.forEach((button) => button.addEventListener("click", () => {

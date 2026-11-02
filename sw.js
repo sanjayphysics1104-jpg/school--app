@@ -1,9 +1,9 @@
-const CACHE_NAME = "sunshine-academy-v5";
+const CACHE_NAME = "sunshine-academy-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css",
-  "./script.js",
+  "./style.css?v=6",
+  "./script.js?v=6",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",

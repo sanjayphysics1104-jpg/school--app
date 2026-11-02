@@ -225,16 +225,20 @@ h1 em, h2 em { color: var(--sun); font-family: "Fraunces", serif; font-weight: 7
 .app-dialog { padding: 0; border: 0; border-radius: 22px; color: var(--ink); background: white; box-shadow: 0 30px 90px rgba(0,0,0,.35); }
 .app-dialog::backdrop { background: rgba(4,18,34,.75); backdrop-filter: blur(5px); }
 .pin-dialog { width: min(430px, calc(100% - 28px)); }
-.pin-dialog form { position: relative; padding: 36px; }
+.pin-dialog-content { position: relative; padding: 36px; }
 .dialog-close { width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; color: var(--muted); background: #eff2f4; font-size: 24px; cursor: pointer; }
-.pin-dialog .dialog-close { position: absolute; top: 18px; right: 18px; }
+.pin-dialog .dialog-close { position: absolute; z-index: 2; top: 18px; right: 18px; }
 .dialog-icon { width: 52px; height: 52px; display: grid; place-items: center; margin-bottom: 18px; border-radius: 16px; background: var(--sun-soft); }
 .pin-dialog h2 { margin-bottom: 8px; font-size: 28px; }
-.pin-dialog > form > p:not(.admin-kicker):not(.dialog-status) { color: var(--muted); font-size: 13px; }
+.pin-dialog-content > div > p:not(.admin-kicker):not(.dialog-status) { color: var(--muted); font-size: 13px; }
 .pin-dialog label { display: block; margin: 20px 0 6px; color: var(--navy); font-size: 11px; font-weight: 700; }
 .pin-dialog input { width: 100%; height: 54px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; font-size: 24px; letter-spacing: 12px; text-align: center; }
 .pin-dialog .admin-submit { width: 100%; margin-top: 15px; }
 .dialog-status { min-height: 20px; margin: 10px 0 0; color: #b13b3b; font-size: 12px; text-align: center; }
+.dialog-status.success { color: var(--green); }
+.pin-options { display: flex; justify-content: center; gap: 18px; margin-top: 4px; }
+.pin-options button, .pin-back { padding: 4px; border: 0; color: var(--blue); background: transparent; font-size: 11px; font-weight: 700; cursor: pointer; }
+.pin-back { display: block; margin: 4px auto 0; }
 .viewer-dialog { width: min(1180px, calc(100% - 24px)); height: min(92vh, 900px); border-radius: 16px; }
 .viewer-shell { height: 100%; display: grid; grid-template-rows: auto 1fr; background: #d8dde2; }
 .viewer-bar { min-height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 10px 14px 10px 20px; color: white; background: var(--navy-deep); }
